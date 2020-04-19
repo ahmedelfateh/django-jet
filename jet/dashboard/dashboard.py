@@ -1,4 +1,6 @@
+from __future__ import absolute_import
 from importlib import import_module
+from six.moves import range
 try:
     from django.core.urlresolvers import reverse
 except ImportError: # Django 1.11
@@ -153,7 +155,7 @@ class Dashboard(object):
     def render(self):
         context = context_to_dict(self.context)
         context.update({
-            'columns': range(self.columns),
+            'columns': list(range(self.columns)),
             'modules': self.modules,
             'app_label': self.app_label,
         })

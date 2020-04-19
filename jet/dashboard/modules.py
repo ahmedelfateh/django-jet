@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import json
 from django import forms
 from django.contrib.admin.models import LogEntry
@@ -6,6 +7,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from jet.utils import get_app_list, LazyDateTimeEncoder, context_to_dict
 import datetime
+from six.moves import map
 
 
 class DashboardModule(object):
@@ -324,14 +326,8 @@ class AppList(DashboardModule):
 
         for app in app_list:
             app_name = app.get('app_label', app.get('name', ''))
-            app['models'] = filter(
-                lambda model: self.models is None or ('%s.%s' % (app_name, model['object_name'])) in self.models or ('%s.*' % app_name) in self.models,
-                app['models']
-            )
-            app['models'] = filter(
-                lambda model: self.exclude is None or (('%s.%s' % (app_name, model['object_name'])) not in self.exclude and ('%s.*' % app_name) not in self.exclude),
-                app['models']
-            )
+            app['models'] = [model for model in app['models'] if self.models is None or ('%s.%s' % (app_name, model['object_name'])) in self.models or ('%s.*' % app_name) in self.models]
+            app['models'] = [model for model in app['models'] if self.exclude is None or (('%s.%s' % (app_name, model['object_name'])) not in self.exclude and ('%s.*' % app_name) not in self.exclude)]
             app['models'] = list(app['models'])
 
             if self.hide_empty and len(list(app['models'])) == 0:
@@ -397,14 +393,8 @@ class ModelList(DashboardModule):
 
         for app in app_list:
             app_name = app.get('app_label', app.get('name', ''))
-            app['models'] = filter(
-                lambda model: self.models is None or ('%s.%s' % (app_name, model['object_name'])) in self.models or ('%s.*' % app_name) in self.models,
-                app['models']
-            )
-            app['models'] = filter(
-                lambda model: self.exclude is None or (('%s.%s' % (app_name, model['object_name'])) not in self.exclude and ('%s.*' % app_name) not in self.exclude),
-                app['models']
-            )
+            app['models'] = [model for model in app['models'] if self.models is None or ('%s.%s' % (app_name, model['object_name'])) in self.models or ('%s.*' % app_name) in self.models]
+            app['models'] = [model for model in app['models'] if self.exclude is None or (('%s.%s' % (app_name, model['object_name'])) not in self.exclude and ('%s.*' % app_name) not in self.exclude)]
             app['models'] = list(app['models'])
 
             models.extend(app['models'])

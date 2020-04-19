@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.test import TestCase
 import pickle
 from jet.ordered_set import OrderedSet

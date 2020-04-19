@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from jet.dashboard import modules
 from jet.dashboard.dashboard import Dashboard
 

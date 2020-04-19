@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from __future__ import absolute_import
 import json
 import os
 from django import template
@@ -20,7 +21,7 @@ from jet.utils import get_model_instance_label, get_model_queryset, get_possible
 try:
     from urllib.parse import parse_qsl
 except ImportError:
-    from urlparse import parse_qsl
+    from six.moves.urllib.parse import parse_qsl
 
 
 register = template.Library()

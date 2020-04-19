@@ -1,9 +1,11 @@
+from __future__ import absolute_import
 import datetime
 import json
 from django.template import Context
 from django.utils import translation
 from jet import settings
 from jet.models import PinnedApplication
+from six.moves import map
 
 try:
     from django.apps.registry import apps
@@ -74,7 +76,7 @@ def get_app_list(context, order=True):
 
             # Check whether user has any perm for this module.
             # If so, add the module to the model_list.
-            if True in perms.values():
+            if True in list(perms.values()):
                 info = (app_label, model._meta.model_name)
                 model_dict = {
                     'name': capfirst(model._meta.verbose_name_plural),
@@ -269,23 +271,23 @@ def get_original_menu_items(context):
 
     original_app_list = get_app_list(context)
 
-    return map(lambda app: {
+    return [{
         'app_label': app['app_label'],
         'url': app['app_url'],
         'url_blank': False,
         'label': app.get('name', capfirst(_(app['app_label']))),
         'has_perms': app.get('has_module_perms', False),
-        'models': list(map(lambda model: {
+        'models': list([{
             'url': model.get('admin_url'),
             'url_blank': False,
             'name': model['model_name'],
             'object_name': model['object_name'],
             'label': model.get('name', model['object_name']),
             'has_perms': any(model.get('perms', {}).values()),
-        }, app['models'])),
+        } for model in app['models']]),
         'pinned': app['app_label'] in pinned_apps,
         'custom': False
-    }, original_app_list)
+    } for app in original_app_list]
 
 
 def get_menu_item_url(url, original_app_list):
@@ -295,10 +297,7 @@ def get_menu_item_url(url, original_app_list):
         if url_type == 'app':
             return original_app_list[url['app_label']]['url']
         elif url_type == 'model':
-            models = dict(map(
-                lambda x: (x['name'], x['url']),
-                original_app_list[url['app_label']]['models']
-            ))
+            models = dict([(x['name'], x['url']) for x in original_app_list[url['app_label']]['models']])
             return models[url['model']]
         elif url_type == 'reverse':
             return reverse(url['name'], args=url.get('args'), kwargs=url.get('kwargs'))
@@ -308,7 +307,7 @@ def get_menu_item_url(url, original_app_list):
 
 def get_menu_items(context):
     pinned_apps = PinnedApplication.objects.filter(user=context['user'].pk).values_list('app_label', flat=True)
-    original_app_list = OrderedDict(map(lambda app: (app['app_label'], app), get_original_menu_items(context)))
+    original_app_list = OrderedDict([(app['app_label'], app) for app in get_original_menu_items(context)])
     custom_app_list = settings.JET_SIDE_MENU_ITEMS
     custom_app_list_deprecated = settings.JET_SIDE_MENU_CUSTOM_APPS
 
@@ -331,10 +330,7 @@ def get_menu_items(context):
                     name = data['name']
 
                 if app_label in original_app_list:
-                    models = dict(map(
-                        lambda x: (x['name'], x),
-                        original_app_list[app_label]['models']
-                    ))
+                    models = dict([(x['name'], x) for x in original_app_list[app_label]['models']])
 
                     if name in models:
                         item = models[name].copy()
@@ -370,7 +366,7 @@ def get_menu_items(context):
                 item['label'] = data['label']
 
             if 'items' in data:
-                item['items'] = list(map(lambda x: get_menu_item_app_model(app_label, x), data['items']))
+                item['items'] = list([get_menu_item_app_model(app_label, x) for x in data['items']])
 
             if 'url' in data:
                 item['url'] = get_menu_item_url(data['url'], original_app_list)
@@ -418,7 +414,7 @@ def get_menu_items(context):
 
                 for model_label in models:
                     if model_label == '__all__':
-                        app['items'] = models_dict[app_label].values()
+                        app['items'] = list(models_dict[app_label].values())
                         break
                     elif model_label in models_dict[app_label]:
                         model = models_dict[app_label][model_label]
@@ -429,7 +425,7 @@ def get_menu_items(context):
         def map_item(item):
             item['items'] = item['models']
             return item
-        app_list = list(map(map_item, original_app_list.values()))
+        app_list = list(map(map_item, list(original_app_list.values())))
 
     current_found = False
 

@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import absolute_import
 import datetime
 import json
 from django import forms
@@ -184,7 +185,7 @@ class GoogleAnalyticsSettingsForm(forms.Form):
         counters = module.counters()
         if counters is not None:
             self.fields['counter'].choices = (('', '-- %s --' % force_text(_('none'))),)
-            self.fields['counter'].choices.extend(map(lambda x: (x['id'], x['websiteUrl']), counters))
+            self.fields['counter'].choices.extend([(x['id'], x['websiteUrl']) for x in counters])
         else:
             label = force_text(_('grant access first')) if module.credential is None else force_text(_('counters loading failed'))
             self.fields['counter'].choices = (('', '-- %s -- ' % label),)

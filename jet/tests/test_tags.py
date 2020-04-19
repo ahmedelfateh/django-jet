@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django import forms
 try:
     from django.core.urlresolvers import reverse

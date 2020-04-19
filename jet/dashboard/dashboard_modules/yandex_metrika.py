@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import absolute_import
 import datetime
 import json
 from django import forms
@@ -23,8 +24,8 @@ try:
     from urllib.error import URLError, HTTPError
 except ImportError:
     import urllib2 as request
-    from urllib2 import URLError, HTTPError
-    from urllib import urlencode
+    from six.moves.urllib.error import URLError, HTTPError
+    from six.moves.urllib.parse import urlencode
 
 JET_MODULE_YANDEX_METRIKA_CLIENT_ID = getattr(settings, 'JET_MODULE_YANDEX_METRIKA_CLIENT_ID', '')
 JET_MODULE_YANDEX_METRIKA_CLIENT_SECRET = getattr(settings, 'JET_MODULE_YANDEX_METRIKA_CLIENT_SECRET', '')
@@ -137,7 +138,7 @@ class YandexMetrikaSettingsForm(forms.Form):
         counters = module.counters()
         if counters is not None:
             self.fields['counter'].choices = (('', '-- %s --' % force_text(_('none'))),)
-            self.fields['counter'].choices.extend(map(lambda x: (x['id'], x['site']), counters))
+            self.fields['counter'].choices.extend([(x['id'], x['site']) for x in counters])
         else:
             label = force_text(_('grant access first')) if module.access_token is None else force_text(_('counters loading failed'))
             self.fields['counter'].choices = (('', '-- %s -- ' % label),)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 try:
@@ -74,10 +75,7 @@ class UpdateDashboardModuleView(SuccessMessageMixin, UpdateView):
             return formset_factory(self.module.child_form, can_delete=True, extra=1)(**self.get_children_formset_kwargs())
 
     def clean_children_data(self, children):
-        children = list(filter(
-            lambda item: isinstance(item, dict) and item and item.get('DELETE') is not True,
-            children
-        ))
+        children = list([item for item in children if isinstance(item, dict) and item and item.get('DELETE') is not True])
         for item in children:
             item.pop('DELETE')
         return children

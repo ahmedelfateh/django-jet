@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.views.decorators.http import require_POST, require_GET
 from jet.forms import AddBookmarkForm, RemoveBookmarkForm, ToggleApplicationPinForm, ModelLookupForm
 from jet.models import Bookmark

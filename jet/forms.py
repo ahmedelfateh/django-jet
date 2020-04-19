@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import json
 from django import forms
 from django.contrib.auth.models import Permission
@@ -142,10 +143,7 @@ class ModelLookupForm(forms.Form):
         page = self.cleaned_data['page'] or 1
         offset = (page - 1) * limit
 
-        items = list(map(
-            lambda instance: {'id': instance.pk, 'text': get_model_instance_label(instance)},
-            qs.all()[offset:offset + limit]
-        ))
+        items = list([{'id': instance.pk, 'text': get_model_instance_label(instance)} for instance in qs.all()[offset:offset + limit]])
         total = qs.count()
 
         return items, total

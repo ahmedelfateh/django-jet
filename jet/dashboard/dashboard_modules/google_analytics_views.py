@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 try:
     from django.core.urlresolvers import reverse
 except ImportError: # Django 1.11

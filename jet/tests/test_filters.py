@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.contrib import admin
 from django.test import TestCase, RequestFactory
 from django.utils.encoding import smart_text
